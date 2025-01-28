@@ -42,7 +42,7 @@ const updateStyles = () => {
     styles.textContent = `
 @font-face {
     font-family: "sitelen";
-    src: url("assets/sitelenselikiwenasuki.ttf") format("truetype");
+    src: url("https://github.com/Sushii64/SitelenPona/raw/refs/heads/main/assets/sitelenselikiwenasuki.ttf") format("truetype");
     font-weight: normal;
     font-style: normal;
 }
