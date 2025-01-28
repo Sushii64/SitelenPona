@@ -4,14 +4,14 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-export default function ExampleWiggle({ wiggle, children }: { wiggle: "x" | "y" | "xy", children: string; }) {
+export default function ExampleText({ children }: { children: string; }) {
     return children.split("").map((x, i) => (
         <span key={i}>
             <span
-                className={`wiggle-inner wiggle-inner-${wiggle}`}
-                style={{
-                    animationDelay: `${(i * 25) % 1200}ms`,
-                }}
+                className={`sitelenpona`}
+            // style={{
+            //     fontFamily: `Comic Sans MS`,
+            // }}
             >
                 {x}
             </span>

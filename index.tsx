@@ -10,121 +10,63 @@ import definePlugin, { OptionType } from "@utils/types";
 import { Text } from "@webpack/common";
 import { ReactNode } from "react";
 
-import ExampleWiggle from "./ui/components/ExampleWiggle";
+import ExampleText from "./ui/components/ExampleText";
 
-const settings = definePluginSettings({
-    intensity: {
-        type: OptionType.SLIDER,
-        description: "Animation intensity in px",
-        markers: makeRange(1, 10, 1),
-        default: 4,
-        stickToMarkers: true,
-        onChange: () => updateStyles()
-    }
-});
+const settings = definePluginSettings({});
 
-const dirMap = {
-    x: "0.6s wiggle-wavy-x alternate ease-in-out infinite",
-    y: "1.2s wiggle-wavy-y linear infinite"
-};
+// const settings = definePluginSettings({
+//     intensity: {
+//         type: OptionType.SLIDER,
+//         description: "Animation intensity in px",
+//         markers: makeRange(1, 10, 1),
+//         default: 4,
+//         stickToMarkers: true,
+//         onChange: () => updateStyles()
+//     }
+// });
+
+// const dirMap = {
+//     x: "0.6s wiggle-wavy-x alternate ease-in-out infinite",
+//     y: "1.2s wiggle-wavy-y linear infinite"
+// };
 
 const classMap = [
     {
-        chars: ["<", ">"],
-        className: "wiggle-inner-x",
-    },
-    {
-        chars: ["^", "^"],
-        className: "wiggle-inner-y",
-    },
-    {
-        chars: [")", "("],
-        className: "wiggle-inner-xy"
+        chars: ["$", "$"],
+        className: "sitelenpona",
     }
 ];
 
 let styles: HTMLStyleElement;
 const updateStyles = () => {
-    const inten = Vencord.Settings.plugins.WigglyText.intensity + "px";
     styles.textContent = `
-.wiggle-example {
-    list-style-type: disc;
-    list-style-position: outside;
-    margin: 4px 0 0 16px;
+@font-face {
+    font-family: "sitelen";
+    src: url("assets/sitelenselikiwenasuki.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
 }
-
-.wiggle-example li {
-    white-space: break-spaces;
-    margin-bottom: 4px;
-}
-
-.wiggle-inner {
-    position: relative;
-    top: 0;
-    left: 0;
-
-    &.wiggle-inner-x {
-        animation: ${dirMap.x};
-    }
-
-    &.wiggle-inner-y {
-        animation: ${dirMap.y};
-    }
-
-    &.wiggle-inner-xy {
-        animation: ${dirMap.x}, ${dirMap.y};
-    }
-}
-
-@keyframes wiggle-wavy-x {
-    from {
-        left: -${inten};
-    }
-
-    to {
-        left: ${inten};
-    }
-}
-
-@keyframes wiggle-wavy-y {
-    0% {
-        top: 0;
-        animation-timing-function: ease-out;
-    }
-
-    25% {
-        top: -${inten};
-        animation-timing-function: ease-in;
-    }
-
-    50% {
-        top: 0;
-        animation-timing-function: ease-out;
-    }
-
-    75% {
-        top: ${inten};
-        animation-timing-function: ease-in;
-    }
+    
+.sitelenpona {
+    font-family: "sitelen";
 }`;
 };
 
 export default definePlugin({
-    name: "WigglyText",
-    description: "Adds a new markdown formatting that makes text wiggly.",
+    name: "SitelenPona",
+    description: "Adds a new markdown formatting that lets you write in sitelen pona!\nFont from https://www.kreativekorp.com/software/fonts/sitelenselikiwen/",
     authors: [{
         name: "Nexpid",
         id: 853550207039832084n
+    }, {
+        name: "Sushii64",
+        id: 738942562584232007n
     }],
     settings,
     settingsAboutComponent: () => (
         <Text>
-            You can make text wiggle with the following:<br />
-            <ul className="wiggle-example">
-                <li><ExampleWiggle wiggle="x">left and right</ExampleWiggle> by typing <code>&lt;~text~&gt;</code></li>
-                <li><ExampleWiggle wiggle="y">up and down</ExampleWiggle> by typing <code>^~text~^</code></li>
-                <li><ExampleWiggle wiggle="xy">in a circle</ExampleWiggle> by typing <code>)~text~(</code></li>
-            </ul>
+            You can make text into sitelen pona with the following:<br />
+            <p><ExampleText>toki a</ExampleText> by typing <code>$text$</code></p>
         </Text>
     ),
 
@@ -133,14 +75,14 @@ export default definePlugin({
             find: "parseToAST:",
             replacement: {
                 match: /(parse[\w]*):(.*?)\((\i)\),/g,
-                replace: "$1:$2({...$3,wiggly:$self.wigglyRule}),",
+                replace: "$1:$2({...$3,sitelenpona:$self.sitelenponaRule}),",
             },
         },
     ],
 
-    wigglyRule: {
+    sitelenponaRule: {
         order: 24,
-        match: (source: string) => classMap.map(({ chars }) => source.match(new RegExp(`^(\\${chars[0]})~([\\s\\S]+?)~(\\${chars[1]})(?!_)`))).find(x => x !== null),
+        match: (source: string) => classMap.map(({ chars }) => source.match(new RegExp(`^(\\${chars[0]})([\\s\\S]+?)(\\${chars[1]})(?!_)`))).find(x => x !== null),
         parse: (
             capture: RegExpMatchArray,
             transform: (...args: any[]) => any,
@@ -167,18 +109,11 @@ export default definePlugin({
                     j++;
                     if (typeof child === "string") {
                         modified = true;
-                        children[j] = child.split("").map((x, i) => (
-                            <span key={i}>
-                                <span
-                                    className={`wiggle-inner ${data.className}`}
-                                    style={{
-                                        animationDelay: `${((offset++) * 25) % 1200}ms`,
-                                    }}
-                                >
-                                    {x}
-                                </span>
+                        children[j] = (
+                            <span key={j} className={`${data.className}`}>
+                                {child}
                             </span>
-                        ));
+                        );
                     } else if (child?.props?.children)
                         child.props.children = traverse(child.props.children);
                 }
@@ -192,7 +127,7 @@ export default definePlugin({
 
     start: () => {
         styles = document.createElement("style");
-        styles.id = "WigglyText";
+        styles.id = "SitelenPona";
         document.head.appendChild(styles);
 
         updateStyles();
